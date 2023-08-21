@@ -1,32 +1,50 @@
-const express = require('express')
-const path = require('path')
-const { readFile, writeFile } = require('fs/promises')
+const express = require("express")
+const hyperid = require("hyperid")
+const path = require("path")
+const { writeFile } = require("fs/promises")
+const { readFileSync } = require("fs")
 const app = express()
 const PORT = 333
-const dataPath = path.join(__dirname, 'data', 'db.json')
-// const { getAndRenderNotes } = require('./public/assets/js/index.js')
+const instance = hyperid()
 
-app.use(express.static('public'))
+app.use(express.static("public"))
 app.use(express.json())
+app.use(express.text())
 app.use(express.urlencoded({ extended: true }))
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'))
-  })
-
-  app.get('/notes', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'notes.html'))
-  })
-
-app.post('/api/notes', (req, res) => {
-  const content = readFile(dataPath, "utf-8")
-  const note = JSON.parse(content)
-  writeFile(dataPath, JSON.stringify(note))
-  console.log(note)
+// page routes
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"))
 })
 
+app.get("/notes", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "notes.html"))
+})
 
+// gets notes
+app.get("/api/notes", (req, res) => {
+  let notes = readFileSync("./db/db.json", "utf-8")
+  res.json(JSON.parse(notes))
+})
+//  posts notes
+app.post("/api/notes", (req, res) => {
+  const newNote = {
+    ...req.body,
+    id: instance(),
+  }
+  let notes = readFileSync("./db/db.json", "utf-8")
+  const notesJSON = JSON.parse(notes)
+  notesJSON.push(newNote)
+
+  writeFile("./db/db.json", JSON.stringify(notesJSON), (err) => {
+    if (err) {
+      throw err
+    }
+  })
+
+  res.json(notes)
+})
 
 app.listen(PORT, () => {
-    console.log(`Express listening on http://localhost:${PORT}`)
-  })
+  console.log(`Express listening on http://localhost:${PORT}`)
+})
