@@ -4,7 +4,7 @@ const path = require("path")
 const { writeFile } = require("fs/promises")
 const { readFileSync } = require("fs")
 const app = express()
-const PORT = 333
+const PORT = process.env.PORT || 333
 const instance = hyperid()
 
 app.use(express.static("public"))
