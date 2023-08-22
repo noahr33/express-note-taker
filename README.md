@@ -18,7 +18,6 @@ Clone or Fork the repository to your computer. Enter `npm i` to install dependan
 
 - Open an integrated terminal from your project folder.
 - Type `node server.js` or `npx nodemon server.js` into the terminal.
-- Answer each prompt that follows.
 
 ## Screenshot
 
